@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Benchmark: Bookorbit v1.4.0 - 10K books</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box}
+    body{font-family:system-ui,sans-serif;background:#0d1117;color:#e6edf3;margin:0;padding:2rem}
+    h1{color:#58a6ff;font-size:1.5rem;margin:0 0 .25rem}
+    .meta{color:#8b949e;font-size:.85rem;margin-bottom:2rem}
+    code{background:#161b22;padding:.15em .4em;border-radius:4px;font-size:.9em}
+    .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-bottom:2rem}
+    .card{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:1rem}
+    .card.idle{border-color:#388bfd44}
+    .lbl{font-size:.7rem;color:#8b949e;text-transform:uppercase;letter-spacing:.06em}
+    .val{font-size:1.4rem;font-weight:700;color:#58a6ff;margin:.25rem 0 .1rem}
+    .val.idle{color:#388bfd}
+    .sub{font-size:.75rem;color:#6e7681}
+    .charts{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem}
+    .cb{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:1.25rem}
+    .cb h3{margin:0 0 1rem;font-size:.9rem;color:#c9d1d9}
+    canvas{max-height:260px}
+    table{width:100%;border-collapse:collapse;background:#161b22;border:1px solid #30363d;border-radius:8px;overflow:hidden}
+    th,td{padding:.7rem 1rem;text-align:left;border-bottom:1px solid #21262d;font-size:.85rem}
+    th{color:#8b949e;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;background:#0d1117}
+    tr.idle-row td{color:#388bfd}
+    tr:last-child td{border-bottom:none}
+    @media(max-width:640px){.charts{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <h1>Benchmark: Bookorbit v1.4.0 - 10K books</h1>
+  <div class="meta">
+    Container: <code>bookorbit_loadtest</code> &nbsp;|&nbsp;
+    2026-05-26 17:29:06 &nbsp;|&nbsp;
+    33 samples @ 5.0s &nbsp;|&nbsp;
+    Books: <strong>10K</strong>
+  </div>
+  <div class="cards">
+    <div class="card"><div class="lbl">Books Ingested</div><div class="val">10K</div><div class="sub">library size for this run</div></div>
+    <div class="card"><div class="lbl">Ingestion Time</div><div class="val">02:33</div><div class="sub">first sample to idle</div></div>
+    <div class="card"><div class="lbl">CPU Peak</div><div class="val">101.2%</div><div class="sub">avg 25.7% &nbsp; min 0.0%</div></div>
+    <div class="card"><div class="lbl">RAM Peak (app)</div><div class="val">281.5 MB</div><div class="sub">avg 222.6 MB &nbsp; min 122.8 MB</div></div>
+    <div class="card"><div class="lbl">RAM Peak (db)</div><div class="val">156.1 MB</div><div class="sub">avg 119.7 MB &nbsp; db: bookorbit_db_loadtest</div></div>
+    <div class="card"><div class="lbl">RAM Peak (total)</div><div class="val">437.6 MB</div><div class="sub">app + db combined</div></div>
+    <div class="card"><div class="lbl">Peak PIDs</div><div class="val">15</div><div class="sub">max threads/processes</div></div>
+    <div class="card idle"><div class="lbl">Idle CPU (avg)</div><div class="val idle">0.1%</div><div class="sub">avg over 120s post-ingestion</div></div>
+    <div class="card idle"><div class="lbl">Idle RAM (avg)</div><div class="val idle">177.3 MB</div><div class="sub">avg over 120s post-ingestion</div></div>
+  </div>
+
+  <div class="charts">
+    <div class="cb"><h3>CPU Usage (%)</h3><canvas id="c1"></canvas></div>
+    <div class="cb"><h3>RAM Usage (MB)</h3><canvas id="c2"></canvas></div>
+    <div class="cb"><h3>Process / Thread Count (PIDs)</h3><canvas id="c3"></canvas></div>
+  </div>
+
+  <table>
+    <thead><tr><th>Metric</th><th>Min</th><th>Max</th><th>Avg</th></tr></thead>
+    <tbody>
+      <tr><td>CPU %</td><td>0.0%</td><td>101.2%</td><td>25.7%</td></tr>
+      <tr><td>RAM (app)</td><td>122.8 MB</td><td>281.5 MB</td><td>222.6 MB</td></tr>
+      <tr><td>RAM (db: bookorbit_db_loadtest)</td><td>-</td><td>156.1 MB</td><td>119.7 MB</td></tr>
+      <tr><td><strong>RAM (total)</strong></td><td>-</td><td><strong>437.6 MB</strong></td><td>342.4 MB</td></tr>
+      <tr><td>PIDs</td><td colspan="2"></td><td>15 peak</td></tr>
+      <tr class="idle-row"><td>Idle CPU (avg post-ingest)</td><td colspan="3">0.1%</td></tr>
+      <tr class="idle-row"><td>Idle RAM (avg post-ingest)</td><td colspan="3">177.3 MB</td></tr>
+      <tr class="idle-row"><td>Idle PIDs (avg post-ingest)</td><td colspan="3">15</td></tr>
+      <tr><td>Ingestion duration</td><td colspan="3"><strong>02:33</strong></td></tr>
+      <tr><td>Total recording</td><td colspan="3">04:33</td></tr>
+    </tbody>
+  </table>
+
+  <script>
+    const labels = ["17:24:31", "17:24:39", "17:24:47", "17:24:55", "17:25:04", "17:25:13", "17:25:22", "17:25:31", "17:25:39", "17:25:47", "17:25:55", "17:26:04", "17:26:13", "17:26:22", "17:26:31", "17:26:39", "17:26:47", "17:26:55", "17:27:04", "17:27:13", "17:27:22", "17:27:31", "17:27:39", "17:27:47", "17:27:55", "17:28:04", "17:28:13", "17:28:22", "17:28:31", "17:28:39", "17:28:47", "17:28:55", "17:29:04"];
+    const annot  = {type:'line',xMin:18,xMax:18,borderColor:'rgba(248,113,113,0.9)',borderWidth:2,borderDash:[6,3],label:{display:true,content:'Ingestion complete',position:'start',color:'#f87171',backgroundColor:'rgba(13,17,23,0.85)',padding:4,font:{size:11}}};
+    const annotations = annot ? { ingestionEnd: annot } : {};
+    const sharedOpts = {
+      responsive:true, maintainAspectRatio:true, animation:false,
+      plugins:{ legend:{display:false}, annotation:{annotations} },
+      scales:{
+        x:{ ticks:{color:'#6e7681',maxTicksLimit:8,font:{size:11}}, grid:{color:'#21262d'} },
+        y:{ ticks:{color:'#6e7681',font:{size:11}}, grid:{color:'#21262d'} }
+      }
+    };
+    function mkChart(id, data, color) {
+      return new Chart(document.getElementById(id), {
+        type: 'line',
+        data: { labels, datasets:[{ data, borderColor:color,
+          backgroundColor:color+'1a', fill:true, tension:0.3,
+          pointRadius:0, borderWidth:1.5 }] },
+        options: sharedOpts
+      });
+    }
+    mkChart('c1', [0.01, 101.18, 84.04, 89.61, 79.51, 80.98, 78.94, 80.78, 78.76, 90.99, 81.36, 0.01, 0.54, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 1.04, 0.03, 0.01, 0.05, 0.05, 0.03, 0.01, 0.71, 0.03, 0.02, 0.02, 0.15, 0.01, 0.01], '#58a6ff');
+    new Chart(document.getElementById('c2'), {
+      type:'line',
+      data:{ labels, datasets:[
+        { label:'App RAM', data:[122.8, 172.2, 265.3, 263.8, 265.5, 272.4, 269.7, 272.3, 271.0, 274.3, 278.6, 280.1, 280.1, 280.1, 280.0, 280.0, 280.0, 280.0, 280.0, 281.5, 280.1, 280.1, 138.1, 138.2, 138.9, 139.1, 139.5, 139.3, 140.7, 140.9, 140.9, 140.9, 140.9], borderColor:'#a371f7', backgroundColor:'#a371f71a', fill:true, tension:0.3, pointRadius:0, borderWidth:1.5 },
+        { label:'DB RAM (bookorbit_db_loadtest)', data:[66.9, 97.74, 129.8, 130.0, 136.8, 130.2, 136.9, 151.5, 154.9, 156.1, 147.5, 149.7, 149.8, 149.5, 119.0, 107.9, 108.0, 108.2, 108.0, 108.5, 108.0, 108.0, 108.0, 108.0, 108.2, 108.0, 108.0, 108.0, 108.0, 108.0, 108.0, 108.3, 108.0], borderColor:'#f0883e', backgroundColor:'#f0883e1a', fill:true, tension:0.3, pointRadius:0, borderWidth:1.5 },
+        { label:'Total RAM', data:[189.7, 269.94, 395.1, 393.8, 402.3, 402.6, 406.6, 423.8, 425.9, 430.4, 426.1, 429.8, 429.9, 429.6, 399.0, 387.9, 388.0, 388.2, 388.0, 390.0, 388.1, 388.1, 246.1, 246.2, 247.1, 247.1, 247.5, 247.3, 248.7, 248.9, 248.9, 249.2, 248.9], borderColor:'#ff7b72', backgroundColor:'transparent', fill:false, tension:0.3, pointRadius:0, borderWidth:2, borderDash:[4,2] }
+      ]},
+      options:{ ...sharedOpts, plugins:{ ...sharedOpts.plugins, legend:{ display:true, labels:{ color:'#8b949e', font:{size:11} } } } }
+    });
+    mkChart('c3', [15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15], '#3fb950');
+  </script>
+</body>
+</html>

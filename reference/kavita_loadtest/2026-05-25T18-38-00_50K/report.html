@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Benchmark: Kavita v0.9.0.2 - 50K books</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box}
+    body{font-family:system-ui,sans-serif;background:#0d1117;color:#e6edf3;margin:0;padding:2rem}
+    h1{color:#58a6ff;font-size:1.5rem;margin:0 0 .25rem}
+    .meta{color:#8b949e;font-size:.85rem;margin-bottom:2rem}
+    code{background:#161b22;padding:.15em .4em;border-radius:4px;font-size:.9em}
+    .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-bottom:2rem}
+    .card{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:1rem}
+    .card.idle{border-color:#388bfd44}
+    .lbl{font-size:.7rem;color:#8b949e;text-transform:uppercase;letter-spacing:.06em}
+    .val{font-size:1.4rem;font-weight:700;color:#58a6ff;margin:.25rem 0 .1rem}
+    .val.idle{color:#388bfd}
+    .sub{font-size:.75rem;color:#6e7681}
+    .charts{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem}
+    .cb{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:1.25rem}
+    .cb h3{margin:0 0 1rem;font-size:.9rem;color:#c9d1d9}
+    canvas{max-height:260px}
+    table{width:100%;border-collapse:collapse;background:#161b22;border:1px solid #30363d;border-radius:8px;overflow:hidden}
+    th,td{padding:.7rem 1rem;text-align:left;border-bottom:1px solid #21262d;font-size:.85rem}
+    th{color:#8b949e;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;background:#0d1117}
+    tr.idle-row td{color:#388bfd}
+    tr:last-child td{border-bottom:none}
+    @media(max-width:640px){.charts{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <h1>Benchmark: Kavita v0.9.0.2 - 50K books</h1>
+  <div class="meta">
+    Container: <code>kavita_loadtest</code> &nbsp;|&nbsp;
+    2026-05-25 18:48:58 &nbsp;|&nbsp;
+    106 samples @ 5.0s &nbsp;|&nbsp;
+    Books: <strong>50K</strong>
+  </div>
+  <div class="cards">
+    <div class="card"><div class="lbl">Books Ingested</div><div class="val">50K</div><div class="sub">library size for this run</div></div>
+    <div class="card"><div class="lbl">Ingestion Time</div><div class="val">08:51</div><div class="sub">first sample to idle</div></div>
+    <div class="card"><div class="lbl">CPU Peak</div><div class="val">159.1%</div><div class="sub">avg 60.2% &nbsp; min 0.5%</div></div>
+    <div class="card"><div class="lbl">RAM Peak</div><div class="val">448.4 MB</div><div class="sub">avg 375.1 MB &nbsp; min 238.8 MB</div></div>
+    <div class="card"><div class="lbl">Peak PIDs</div><div class="val">52</div><div class="sub">max threads/processes</div></div>
+    <div class="card idle"><div class="lbl">Idle CPU (avg)</div><div class="val idle">1.0%</div><div class="sub">avg over 125s post-ingestion</div></div>
+    <div class="card idle"><div class="lbl">Idle RAM (avg)</div><div class="val idle">436.8 MB</div><div class="sub">avg over 125s post-ingestion</div></div>
+  </div>
+
+  <div class="charts">
+    <div class="cb"><h3>CPU Usage (%)</h3><canvas id="c1"></canvas></div>
+    <div class="cb"><h3>RAM Usage (MB)</h3><canvas id="c2"></canvas></div>
+    <div class="cb"><h3>Process / Thread Count (PIDs)</h3><canvas id="c3"></canvas></div>
+  </div>
+
+  <table>
+    <thead><tr><th>Metric</th><th>Min</th><th>Max</th><th>Avg</th></tr></thead>
+    <tbody>
+      <tr><td>CPU %</td><td>0.5%</td><td>159.1%</td><td>60.2%</td></tr>
+      <tr><td>RAM</td><td>238.8 MB</td><td>448.4 MB</td><td>375.1 MB</td></tr>
+      <tr><td>PIDs</td><td colspan="2"></td><td>52 peak</td></tr>
+      <tr class="idle-row"><td>Idle CPU (avg post-ingest)</td><td colspan="3">1.0%</td></tr>
+      <tr class="idle-row"><td>Idle RAM (avg post-ingest)</td><td colspan="3">436.8 MB</td></tr>
+      <tr class="idle-row"><td>Idle PIDs (avg post-ingest)</td><td colspan="3">43</td></tr>
+      <tr><td>Ingestion duration</td><td colspan="3"><strong>08:51</strong></td></tr>
+      <tr><td>Total recording</td><td colspan="3">10:57</td></tr>
+    </tbody>
+  </table>
+
+  <script>
+    const labels = ["18:38:01", "18:38:08", "18:38:14", "18:38:20", "18:38:26", "18:38:32", "18:38:39", "18:38:45", "18:38:51", "18:38:58", "18:39:04", "18:39:10", "18:39:16", "18:39:22", "18:39:29", "18:39:35", "18:39:41", "18:39:48", "18:39:54", "18:40:00", "18:40:06", "18:40:12", "18:40:19", "18:40:25", "18:40:31", "18:40:38", "18:40:44", "18:40:50", "18:40:56", "18:41:02", "18:41:09", "18:41:15", "18:41:21", "18:41:28", "18:41:34", "18:41:40", "18:41:46", "18:41:52", "18:41:59", "18:42:05", "18:42:11", "18:42:18", "18:42:24", "18:42:30", "18:42:36", "18:42:42", "18:42:49", "18:42:55", "18:43:01", "18:43:08", "18:43:14", "18:43:20", "18:43:26", "18:43:32", "18:43:39", "18:43:45", "18:43:51", "18:43:58", "18:44:04", "18:44:10", "18:44:16", "18:44:22", "18:44:29", "18:44:35", "18:44:41", "18:44:48", "18:44:54", "18:45:00", "18:45:06", "18:45:12", "18:45:19", "18:45:25", "18:45:31", "18:45:38", "18:45:44", "18:45:50", "18:45:56", "18:46:02", "18:46:09", "18:46:15", "18:46:21", "18:46:28", "18:46:34", "18:46:40", "18:46:46", "18:46:52", "18:46:59", "18:47:05", "18:47:11", "18:47:18", "18:47:24", "18:47:30", "18:47:36", "18:47:42", "18:47:49", "18:47:55", "18:48:01", "18:48:08", "18:48:14", "18:48:20", "18:48:26", "18:48:32", "18:48:39", "18:48:45", "18:48:51", "18:48:58"];
+    const annot  = {type:'line',xMin:85,xMax:85,borderColor:'rgba(248,113,113,0.9)',borderWidth:2,borderDash:[6,3],label:{display:true,content:'Ingestion complete',position:'start',color:'#f87171',backgroundColor:'rgba(13,17,23,0.85)',padding:4,font:{size:11}}};
+    const annotations = annot ? { ingestionEnd: annot } : {};
+    const sharedOpts = {
+      responsive:true, maintainAspectRatio:true, animation:false,
+      plugins:{ legend:{display:false}, annotation:{annotations} },
+      scales:{
+        x:{ ticks:{color:'#6e7681',maxTicksLimit:8,font:{size:11}}, grid:{color:'#21262d'} },
+        y:{ ticks:{color:'#6e7681',font:{size:11}}, grid:{color:'#21262d'} }
+      }
+    };
+    function mkChart(id, data, color) {
+      return new Chart(document.getElementById(id), {
+        type: 'line',
+        data: { labels, datasets:[{ data, borderColor:color,
+          backgroundColor:color+'1a', fill:true, tension:0.3,
+          pointRadius:0, borderWidth:1.5 }] },
+        options: sharedOpts
+      });
+    }
+    mkChart('c1', [2.36, 0.67, 80.0, 14.81, 82.1, 86.4, 87.69, 93.44, 89.01, 91.6, 89.3, 91.19, 89.46, 92.95, 88.07, 93.05, 94.48, 91.93, 92.71, 94.71, 92.39, 94.48, 94.44, 82.06, 81.88, 81.65, 83.26, 83.08, 83.49, 89.41, 85.13, 85.29, 80.27, 101.75, 159.05, 97.89, 92.62, 92.17, 92.11, 90.38, 90.99, 92.47, 97.19, 89.07, 92.31, 92.36, 90.0, 89.33, 87.74, 89.85, 91.95, 89.15, 85.86, 88.36, 89.28, 89.87, 90.12, 89.98, 90.39, 85.8, 86.1, 87.42, 94.68, 87.27, 89.38, 88.97, 89.41, 90.39, 86.93, 90.14, 85.27, 87.53, 85.21, 0.65, 6.74, 0.8, 1.15, 3.89, 0.54, 0.72, 0.91, 4.35, 0.7, 0.68, 4.55, 3.26, 0.58, 0.77, 0.83, 0.77, 0.63, 0.62, 0.57, 0.65, 0.77, 0.83, 0.73, 0.59, 0.74, 0.82, 0.84, 3.03, 0.6, 0.73, 0.68, 1.66], '#58a6ff');
+    mkChart('c2', [239.2, 238.8, 247.9, 250.5, 257.0, 257.6, 262.0, 269.4, 266.6, 266.5, 266.5, 269.4, 257.8, 258.5, 258.3, 258.6, 258.5, 259.0, 258.8, 258.7, 259.4, 258.9, 259.7, 267.7, 263.1, 264.2, 267.1, 275.0, 278.1, 283.7, 291.3, 295.8, 299.8, 308.4, 341.1, 364.2, 370.1, 379.2, 403.6, 428.1, 406.9, 405.9, 396.5, 409.6, 433.0, 418.9, 414.2, 413.6, 414.9, 428.4, 422.3, 426.3, 415.2, 418.5, 423.5, 445.3, 422.6, 417.0, 416.8, 417.1, 435.0, 426.1, 417.5, 418.1, 418.5, 426.8, 446.2, 433.4, 427.2, 427.7, 428.7, 438.3, 442.0, 442.8, 443.0, 442.7, 442.3, 442.5, 442.5, 448.4, 443.7, 442.8, 442.2, 442.1, 443.2, 443.9, 442.9, 443.0, 442.6, 442.6, 442.5, 442.7, 442.5, 442.5, 442.5, 442.5, 430.9, 430.2, 430.4, 430.1, 430.4, 430.2, 430.0, 430.0, 430.0, 430.8], '#a371f7');
+    mkChart('c3', [43, 43, 44, 44, 44, 44, 44, 47, 47, 47, 46, 43, 45, 45, 45, 44, 43, 43, 44, 44, 43, 43, 43, 44, 44, 44, 43, 44, 45, 46, 46, 45, 44, 45, 47, 47, 50, 50, 51, 50, 50, 50, 51, 51, 51, 52, 51, 50, 51, 50, 52, 52, 48, 48, 47, 46, 48, 47, 48, 47, 46, 47, 48, 48, 47, 48, 47, 48, 48, 49, 48, 46, 47, 48, 48, 46, 42, 43, 42, 49, 48, 49, 49, 48, 48, 49, 48, 49, 42, 42, 41, 42, 42, 42, 42, 42, 44, 43, 43, 42, 43, 43, 42, 42, 42, 44], '#3fb950');
+  </script>
+</body>
+</html>

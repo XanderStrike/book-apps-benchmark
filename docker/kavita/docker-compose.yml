@@ -1,0 +1,12 @@
+services:
+  kavita:
+    image: jvmilazz0/kavita:0.9.0.2
+    container_name: kavita_loadtest
+    restart: unless-stopped
+    ports:
+      - "6062:5000"
+    volumes:
+      - ./data:/kavita/config
+      - ../../books:/books:ro
+    environment:
+      - TZ=Etc/UTC

@@ -1,0 +1,43 @@
+services:
+  grimmory:
+    image: grimmory/grimmory:v3.1.0
+    container_name: grimmory_loadtest
+    environment:
+      - USER_ID=1000
+      - GROUP_ID=1000
+      - TZ=Etc/UTC
+      - DATABASE_URL=jdbc:mariadb://mariadb:3306/grimmory
+      - DATABASE_USERNAME=grimmory
+      - DATABASE_PASSWORD=loadtest_password
+      - API_DOCS_ENABLED=true
+      - FORCE_DISABLE_OIDC=true
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    ports:
+      - "6060:6060"
+    volumes:
+      - ./data:/app/data
+      - ../../books:/books:ro
+      - ./bookdrop:/bookdrop
+    restart: unless-stopped
+
+  mariadb:
+    image: lscr.io/linuxserver/mariadb:11.4.8
+    container_name: grimmory_mariadb_loadtest
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - MYSQL_ROOT_PASSWORD=loadtest_root_password
+      - MYSQL_DATABASE=grimmory
+      - MYSQL_USER=grimmory
+      - MYSQL_PASSWORD=loadtest_password
+    volumes:
+      - ./config:/config
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mariadb-admin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10

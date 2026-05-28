@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Benchmark: Grimmory v3.1.0 - 10K books</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box}
+    body{font-family:system-ui,sans-serif;background:#0d1117;color:#e6edf3;margin:0;padding:2rem}
+    h1{color:#58a6ff;font-size:1.5rem;margin:0 0 .25rem}
+    .meta{color:#8b949e;font-size:.85rem;margin-bottom:2rem}
+    code{background:#161b22;padding:.15em .4em;border-radius:4px;font-size:.9em}
+    .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-bottom:2rem}
+    .card{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:1rem}
+    .card.idle{border-color:#388bfd44}
+    .lbl{font-size:.7rem;color:#8b949e;text-transform:uppercase;letter-spacing:.06em}
+    .val{font-size:1.4rem;font-weight:700;color:#58a6ff;margin:.25rem 0 .1rem}
+    .val.idle{color:#388bfd}
+    .sub{font-size:.75rem;color:#6e7681}
+    .charts{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem}
+    .cb{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:1.25rem}
+    .cb h3{margin:0 0 1rem;font-size:.9rem;color:#c9d1d9}
+    canvas{max-height:260px}
+    table{width:100%;border-collapse:collapse;background:#161b22;border:1px solid #30363d;border-radius:8px;overflow:hidden}
+    th,td{padding:.7rem 1rem;text-align:left;border-bottom:1px solid #21262d;font-size:.85rem}
+    th{color:#8b949e;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;background:#0d1117}
+    tr.idle-row td{color:#388bfd}
+    tr:last-child td{border-bottom:none}
+    @media(max-width:640px){.charts{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <h1>Benchmark: Grimmory v3.1.0 - 10K books</h1>
+  <div class="meta">
+    Container: <code>grimmory_loadtest</code> &nbsp;|&nbsp;
+    2026-05-26 17:39:18 &nbsp;|&nbsp;
+    49 samples @ 5.0s &nbsp;|&nbsp;
+    Books: <strong>10K</strong>
+  </div>
+  <div class="cards">
+    <div class="card"><div class="lbl">Books Ingested</div><div class="val">10K</div><div class="sub">library size for this run</div></div>
+    <div class="card"><div class="lbl">Ingestion Time</div><div class="val">04:51</div><div class="sub">first sample to idle</div></div>
+    <div class="card"><div class="lbl">CPU Peak</div><div class="val">282.0%</div><div class="sub">avg 32.9% &nbsp; min 0.4%</div></div>
+    <div class="card"><div class="lbl">RAM Peak (app)</div><div class="val">2.26 GB</div><div class="sub">avg 889.5 MB &nbsp; min 452.4 MB</div></div>
+    <div class="card"><div class="lbl">RAM Peak (db)</div><div class="val">192.9 MB</div><div class="sub">avg 184.4 MB &nbsp; db: grimmory_mariadb_loadtest</div></div>
+    <div class="card"><div class="lbl">RAM Peak (total)</div><div class="val">2.45 GB</div><div class="sub">app + db combined</div></div>
+    <div class="card"><div class="lbl">Peak PIDs</div><div class="val">85</div><div class="sub">max threads/processes</div></div>
+    <div class="card idle"><div class="lbl">Idle CPU (avg)</div><div class="val idle">0.9%</div><div class="sub">avg over 120s post-ingestion</div></div>
+    <div class="card idle"><div class="lbl">Idle RAM (avg)</div><div class="val idle">546.6 MB</div><div class="sub">avg over 120s post-ingestion</div></div>
+  </div>
+
+  <div class="charts">
+    <div class="cb"><h3>CPU Usage (%)</h3><canvas id="c1"></canvas></div>
+    <div class="cb"><h3>RAM Usage (MB)</h3><canvas id="c2"></canvas></div>
+    <div class="cb"><h3>Process / Thread Count (PIDs)</h3><canvas id="c3"></canvas></div>
+  </div>
+
+  <table>
+    <thead><tr><th>Metric</th><th>Min</th><th>Max</th><th>Avg</th></tr></thead>
+    <tbody>
+      <tr><td>CPU %</td><td>0.4%</td><td>282.0%</td><td>32.9%</td></tr>
+      <tr><td>RAM (app)</td><td>452.4 MB</td><td>2.26 GB</td><td>889.5 MB</td></tr>
+      <tr><td>RAM (db: grimmory_mariadb_loadtest)</td><td>-</td><td>192.9 MB</td><td>184.4 MB</td></tr>
+      <tr><td><strong>RAM (total)</strong></td><td>-</td><td><strong>2.45 GB</strong></td><td>1.05 GB</td></tr>
+      <tr><td>PIDs</td><td colspan="2"></td><td>85 peak</td></tr>
+      <tr class="idle-row"><td>Idle CPU (avg post-ingest)</td><td colspan="3">0.9%</td></tr>
+      <tr class="idle-row"><td>Idle RAM (avg post-ingest)</td><td colspan="3">546.6 MB</td></tr>
+      <tr class="idle-row"><td>Idle PIDs (avg post-ingest)</td><td colspan="3">68</td></tr>
+      <tr><td>Ingestion duration</td><td colspan="3"><strong>04:51</strong></td></tr>
+      <tr><td>Total recording</td><td colspan="3">06:51</td></tr>
+    </tbody>
+  </table>
+
+  <script>
+    const labels = ["17:32:24", "17:32:33", "17:32:42", "17:32:51", "17:32:59", "17:33:07", "17:33:15", "17:33:24", "17:33:33", "17:33:42", "17:33:51", "17:33:59", "17:34:07", "17:34:15", "17:34:24", "17:34:33", "17:34:42", "17:34:51", "17:34:59", "17:35:07", "17:35:15", "17:35:24", "17:35:33", "17:35:42", "17:35:51", "17:35:59", "17:36:07", "17:36:15", "17:36:24", "17:36:33", "17:36:42", "17:36:51", "17:36:59", "17:37:07", "17:37:15", "17:37:24", "17:37:33", "17:37:42", "17:37:51", "17:37:59", "17:38:07", "17:38:15", "17:38:24", "17:38:33", "17:38:42", "17:38:51", "17:38:59", "17:39:07", "17:39:15"];
+    const annot  = {type:'line',xMin:34,xMax:34,borderColor:'rgba(248,113,113,0.9)',borderWidth:2,borderDash:[6,3],label:{display:true,content:'Ingestion complete',position:'start',color:'#f87171',backgroundColor:'rgba(13,17,23,0.85)',padding:4,font:{size:11}}};
+    const annotations = annot ? { ingestionEnd: annot } : {};
+    const sharedOpts = {
+      responsive:true, maintainAspectRatio:true, animation:false,
+      plugins:{ legend:{display:false}, annotation:{annotations} },
+      scales:{
+        x:{ ticks:{color:'#6e7681',maxTicksLimit:8,font:{size:11}}, grid:{color:'#21262d'} },
+        y:{ ticks:{color:'#6e7681',font:{size:11}}, grid:{color:'#21262d'} }
+      }
+    };
+    function mkChart(id, data, color) {
+      return new Chart(document.getElementById(id), {
+        type: 'line',
+        data: { labels, datasets:[{ data, borderColor:color,
+          backgroundColor:color+'1a', fill:true, tension:0.3,
+          pointRadius:0, borderWidth:1.5 }] },
+        options: sharedOpts
+      });
+    }
+    mkChart('c1', [0.54, 51.99, 238.36, 172.82, 282.0, 179.0, 119.24, 92.68, 96.09, 70.74, 101.2, 51.31, 49.81, 63.43, 0.62, 0.73, 0.71, 0.54, 0.68, 5.35, 1.12, 0.89, 0.46, 0.63, 0.43, 0.46, 12.34, 1.46, 1.01, 0.51, 0.56, 0.62, 0.46, 1.64, 1.17, 0.72, 0.47, 0.64, 0.48, 0.41, 2.76, 1.06, 0.79, 0.42, 0.56, 0.54, 0.42, 1.8, 1.11], '#58a6ff');
+    new Chart(document.getElementById('c2'), {
+      type:'line',
+      data:{ labels, datasets:[
+        { label:'App RAM', data:[452.4, 473.0, 595.5, 1101.82, 2165.76, 1897.47, 1577.98, 1432.58, 2214.91, 2238.46, 2256.9, 1918.98, 1451.01, 2312.19, 1359.87, 1359.87, 1359.87, 528.9, 532.8, 547.2, 572.0, 539.1, 541.1, 545.1, 533.9, 535.9, 547.7, 566.4, 533.2, 535.2, 545.2, 533.2, 537.5, 545.4, 570.2, 534.2, 536.2, 549.9, 537.8, 539.8, 551.6, 563.6, 540.8, 542.8, 552.8, 536.8, 536.8, 543.1, 562.6], borderColor:'#a371f7', backgroundColor:'#a371f71a', fill:true, tension:0.3, pointRadius:0, borderWidth:1.5 },
+        { label:'DB RAM (grimmory_mariadb_loadtest)', data:[144.0, 144.3, 146.3, 150.8, 154.0, 162.5, 168.2, 174.4, 179.2, 181.9, 185.4, 187.8, 189.7, 191.0, 190.8, 190.8, 190.8, 190.7, 190.7, 190.7, 190.7, 190.7, 190.6, 190.6, 190.6, 190.6, 190.6, 190.7, 190.6, 190.6, 190.6, 190.6, 190.6, 190.6, 190.9, 190.6, 190.8, 190.6, 190.7, 190.6, 190.6, 190.6, 190.6, 190.6, 190.4, 192.9, 190.4, 190.4, 190.4], borderColor:'#f0883e', backgroundColor:'#f0883e1a', fill:true, tension:0.3, pointRadius:0, borderWidth:1.5 },
+        { label:'Total RAM', data:[596.4, 617.3, 741.8, 1252.62, 2319.76, 2059.97, 1746.18, 1606.98, 2394.11, 2420.36, 2442.3, 2106.78, 1640.71, 2503.19, 1550.67, 1550.67, 1550.67, 719.6, 723.5, 737.9, 762.7, 729.8, 731.7, 735.7, 724.5, 726.5, 738.3, 757.1, 723.8, 725.8, 735.8, 723.8, 728.1, 736.0, 761.1, 724.8, 727.0, 740.5, 728.5, 730.4, 742.2, 754.2, 731.4, 733.4, 743.2, 729.7, 727.2, 733.5, 753.0], borderColor:'#ff7b72', backgroundColor:'transparent', fill:false, tension:0.3, pointRadius:0, borderWidth:2, borderDash:[4,2] }
+      ]},
+      options:{ ...sharedOpts, plugins:{ ...sharedOpts.plugins, legend:{ display:true, labels:{ color:'#8b949e', font:{size:11} } } } }
+    });
+    mkChart('c3', [76, 76, 78, 78, 80, 79, 79, 79, 79, 79, 79, 79, 85, 78, 76, 76, 76, 76, 76, 76, 74, 74, 74, 74, 74, 74, 69, 66, 66, 66, 66, 66, 66, 65, 72, 72, 72, 72, 72, 72, 71, 64, 64, 64, 64, 64, 64, 64, 71], '#3fb950');
+  </script>
+</body>
+</html>

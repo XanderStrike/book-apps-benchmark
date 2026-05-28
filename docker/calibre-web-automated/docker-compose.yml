@@ -1,0 +1,17 @@
+services:
+  calibre-web-automated:
+    image: crocodilestick/calibre-web-automated:v4.0.6
+    container_name: calibre_web_automated_loadtest
+    restart: unless-stopped
+    ports:
+      - "6065:8083"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - NETWORK_SHARE_MODE=false
+    volumes:
+      - ./config:/config
+      - ./data/ingest:/cwa-book-ingest
+      - ./data/calibre-library:/calibre-library
+      - ../../books:/books:ro

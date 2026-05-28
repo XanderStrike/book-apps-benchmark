@@ -1,0 +1,14 @@
+services:
+  stump:
+    image: aaronleopold/stump:0.1.3
+    container_name: stump_loadtest
+    restart: unless-stopped
+    ports:
+      - "6064:10801"
+    volumes:
+      - ./config:/config
+      - ../../books:/data/books:ro
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC

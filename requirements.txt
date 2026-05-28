@@ -1,0 +1,2 @@
+# rich is optional - monitor.py falls back to plain text output without it
+rich>=13.0
