@@ -88,8 +88,68 @@ def _to_mb(s: str) -> float:
     return float(m.group(1)) * _UNITS.get(m.group(2).lower(), 0.0)
 
 
+def _parse_stats(d: dict) -> tuple[float, float, int]:
+    """Parse a stats JSON dict from docker or podman. Returns (cpu_pct, mem_mb, pids)."""
+    # Docker format: CPUPerc="1.19%", MemUsage="20.5MiB / 1.9GiB", PIDs="10"
+    if "CPUPerc" in d:
+        cpu = float(d["CPUPerc"].strip().rstrip("%"))
+        mem_parts = d.get("MemUsage", "0B / 0B").split("/")
+        mem = _to_mb(mem_parts[0])
+        pids = int(str(d.get("PIDs", "0")).strip() or "0")
+        return cpu, mem, pids
+    # Podman format: CPU=lifetime_avg, MemUsage=bytes, PIDs=int
+    # CPU is a lifetime average which is misleading after high-CPU bursts.
+    # We return it here but poll() computes instantaneous CPU from deltas.
+    cpu = float(d.get("CPU", 0))
+    mem_bytes = d.get("MemUsage", 0)
+    mem = float(mem_bytes) / (1024 ** 2) if mem_bytes else 0.0
+    pids = int(d.get("PIDs", 0))
+    return cpu, mem, pids
+
+
+# Track previous podman CPU nanosecond readings for instantaneous CPU calculation
+_prev_cpu_nano: dict[str, int] = {}
+_prev_sys_nano: dict[str, int] = {}
+_prev_cpu_cores: dict[str, int] = {}
+
+
+def _compute_instantaneous_cpu(container: str, d: dict) -> float:
+    """Compute instantaneous CPU% from podman's cumulative nanosecond counters."""
+    cpu_nano = int(d.get("CPUNano", 0))
+    sys_nano = int(d.get("SystemNano", 0))
+
+    if container not in _prev_cpu_nano:
+        _prev_cpu_nano[container] = cpu_nano
+        _prev_sys_nano[container] = sys_nano
+        # Detect CPU cores from the container's cgroup
+        try:
+            r = subprocess.run(
+                ["docker", "inspect", "--format", "{{.NCPU}}", container],
+                capture_output=True, text=True, timeout=10,
+            )
+            ncpu = int(r.stdout.strip() or "0")
+            _prev_cpu_cores[container] = max(ncpu, 1)
+        except Exception:
+            _prev_cpu_cores[container] = 1
+        # First sample: return the lifetime average as a rough estimate
+        return float(d.get("CPU", 0))
+
+    delta_cpu = cpu_nano - _prev_cpu_nano[container]
+    delta_sys = sys_nano - _prev_sys_nano[container]
+    _prev_cpu_nano[container] = cpu_nano
+    _prev_sys_nano[container] = sys_nano
+
+    ncpu = _prev_cpu_cores.get(container, 1)
+    if delta_sys > 0:
+        instant_cpu = (delta_cpu / delta_sys) * 100.0 * ncpu
+    else:
+        instant_cpu = float(d.get("CPU", 0))
+
+    return instant_cpu
+
+
 def poll(container: str) -> Optional[Sample]:
-    """Run docker stats --no-stream and return a Sample, or None on failure."""
+    """Run docker/podman stats --no-stream and return a Sample, or None on failure."""
     try:
         r = subprocess.run(
             ["docker", "stats", "--no-stream", "--format", "{{json .}}", container],
@@ -99,10 +159,12 @@ def poll(container: str) -> Optional[Sample]:
         if not line:
             return None
         d = json.loads(line)
-        cpu = float(d.get("CPUPerc", "0%").strip().rstrip("%"))
-        mem_parts = d.get("MemUsage", "0B / 0B").split("/")
-        mem = _to_mb(mem_parts[0])
-        pids = int(d.get("PIDs", "0").strip() or "0")
+        _, mem, pids = _parse_stats(d)
+        # Use instantaneous CPU for podman (which has CPUNano/SystemNano)
+        if "CPUNano" in d:
+            cpu = _compute_instantaneous_cpu(container, d)
+        else:
+            cpu = float(d.get("CPUPerc", "0%").strip().rstrip("%"))
         return Sample(time.time(), cpu, mem, pids)
     except Exception:
         return None
@@ -119,8 +181,8 @@ def poll_mem(container: str) -> float:
         if not line:
             return 0.0
         d = json.loads(line)
-        mem_parts = d.get("MemUsage", "0B / 0B").split("/")
-        return _to_mb(mem_parts[0])
+        _, mem, _ = _parse_stats(d)
+        return mem
     except Exception:
         return 0.0
 
@@ -540,7 +602,8 @@ def main() -> None:
         ["docker", "inspect", "--format", "{{.State.Running}}", container],
         capture_output=True, text=True,
     )
-    if check.returncode != 0 or check.stdout.strip() != "true":
+    running = check.returncode == 0 and check.stdout.strip().lower() == "true"
+    if not running:
         print(f"Error: container '{container}' is not running.")
         print("Run:  docker ps  to see running containers.")
         sys.exit(1)
@@ -550,7 +613,8 @@ def main() -> None:
             ["docker", "inspect", "--format", "{{.State.Running}}", db_container],
             capture_output=True, text=True,
         )
-        if db_check.returncode != 0 or db_check.stdout.strip() != "true":
+        db_running = db_check.returncode == 0 and db_check.stdout.strip().lower() == "true"
+        if not db_running:
             print(f"Error: db container '{db_container}' is not running.")
             print("Run:  docker ps  to see running containers.")
             sys.exit(1)

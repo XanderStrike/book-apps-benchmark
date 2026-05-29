@@ -1,0 +1,13 @@
+services:
+  microopds:
+    image: xanderstrike/microopds
+    container_name: microopds_loadtest
+    restart: unless-stopped
+    ports:
+      - "6070:8080"
+    volumes:
+      - ../../books:/books:ro
+    environment:
+      - TZ=Etc/UTC
+    # Override dir per run: change books_10K to books_50K, books_100K, etc.
+    command: ["microopds", "-dir", "/books/books_10K", "-port", "8080", "-defer-scan"]

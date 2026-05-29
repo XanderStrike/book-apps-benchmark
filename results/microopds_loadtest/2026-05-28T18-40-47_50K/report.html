@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Benchmark: MicroOPDS - 50K books</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box}
+    body{font-family:system-ui,sans-serif;background:#0d1117;color:#e6edf3;margin:0;padding:2rem}
+    h1{color:#58a6ff;font-size:1.5rem;margin:0 0 .25rem}
+    .meta{color:#8b949e;font-size:.85rem;margin-bottom:2rem}
+    code{background:#161b22;padding:.15em .4em;border-radius:4px;font-size:.9em}
+    .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-bottom:2rem}
+    .card{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:1rem}
+    .card.idle{border-color:#388bfd44}
+    .lbl{font-size:.7rem;color:#8b949e;text-transform:uppercase;letter-spacing:.06em}
+    .val{font-size:1.4rem;font-weight:700;color:#58a6ff;margin:.25rem 0 .1rem}
+    .val.idle{color:#388bfd}
+    .sub{font-size:.75rem;color:#6e7681}
+    .charts{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem}
+    .cb{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:1.25rem}
+    .cb h3{margin:0 0 1rem;font-size:.9rem;color:#c9d1d9}
+    canvas{max-height:260px}
+    table{width:100%;border-collapse:collapse;background:#161b22;border:1px solid #30363d;border-radius:8px;overflow:hidden}
+    th,td{padding:.7rem 1rem;text-align:left;border-bottom:1px solid #21262d;font-size:.85rem}
+    th{color:#8b949e;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;background:#0d1117}
+    tr.idle-row td{color:#388bfd}
+    tr:last-child td{border-bottom:none}
+    @media(max-width:640px){.charts{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <h1>Benchmark: MicroOPDS - 50K books</h1>
+  <div class="meta">
+    Container: <code>microopds_loadtest</code> &nbsp;|&nbsp;
+    2026-05-28 18:42:11 &nbsp;|&nbsp;
+    41 samples @ 2.0s &nbsp;|&nbsp;
+    Books: <strong>50K</strong>
+  </div>
+  <div class="cards">
+    <div class="card"><div class="lbl">Books Ingested</div><div class="val">50K</div><div class="sub">library size for this run</div></div>
+    <div class="card"><div class="lbl">Ingestion Time</div><div class="val">00:51</div><div class="sub">first sample to idle</div></div>
+    <div class="card"><div class="lbl">CPU Peak</div><div class="val">66.5%</div><div class="sub">avg 9.0% &nbsp; min 0.0%</div></div>
+    <div class="card"><div class="lbl">RAM Peak</div><div class="val">81.8 MB</div><div class="sub">avg 71.4 MB &nbsp; min 1.1 MB</div></div>
+    <div class="card"><div class="lbl">Peak PIDs</div><div class="val">10</div><div class="sub">max threads/processes</div></div>
+    <div class="card idle"><div class="lbl">Idle CPU (avg)</div><div class="val idle">0.0%</div><div class="sub">avg over 31s post-ingestion</div></div>
+    <div class="card idle"><div class="lbl">Idle RAM (avg)</div><div class="val idle">81.4 MB</div><div class="sub">avg over 31s post-ingestion</div></div>
+  </div>
+
+  <div class="charts">
+    <div class="cb"><h3>CPU Usage (%)</h3><canvas id="c1"></canvas></div>
+    <div class="cb"><h3>RAM Usage (MB)</h3><canvas id="c2"></canvas></div>
+    <div class="cb"><h3>Process / Thread Count (PIDs)</h3><canvas id="c3"></canvas></div>
+  </div>
+
+  <table>
+    <thead><tr><th>Metric</th><th>Min</th><th>Max</th><th>Avg</th></tr></thead>
+    <tbody>
+      <tr><td>CPU %</td><td>0.0%</td><td>66.5%</td><td>9.0%</td></tr>
+      <tr><td>RAM</td><td>1.1 MB</td><td>81.8 MB</td><td>71.4 MB</td></tr>
+      <tr><td>PIDs</td><td colspan="2"></td><td>10 peak</td></tr>
+      <tr class="idle-row"><td>Idle CPU (avg post-ingest)</td><td colspan="3">0.0%</td></tr>
+      <tr class="idle-row"><td>Idle RAM (avg post-ingest)</td><td colspan="3">81.4 MB</td></tr>
+      <tr class="idle-row"><td>Idle PIDs (avg post-ingest)</td><td colspan="3">10</td></tr>
+      <tr><td>Ingestion duration</td><td colspan="3"><strong>00:51</strong></td></tr>
+      <tr><td>Total recording</td><td colspan="3">01:23</td></tr>
+    </tbody>
+  </table>
+
+  <script>
+    const labels = ["18:40:47", "18:40:50", "18:40:52", "18:40:54", "18:40:56", "18:40:58", "18:41:00", "18:41:02", "18:41:04", "18:41:06", "18:41:08", "18:41:10", "18:41:12", "18:41:14", "18:41:16", "18:41:19", "18:41:21", "18:41:23", "18:41:25", "18:41:27", "18:41:29", "18:41:31", "18:41:33", "18:41:35", "18:41:37", "18:41:39", "18:41:42", "18:41:44", "18:41:46", "18:41:48", "18:41:50", "18:41:52", "18:41:54", "18:41:56", "18:41:58", "18:42:00", "18:42:02", "18:42:04", "18:42:07", "18:42:09", "18:42:11"];
+    const annot  = {type:'line',xMin:25,xMax:25,borderColor:'rgba(248,113,113,0.9)',borderWidth:2,borderDash:[6,3],label:{display:true,content:'Ingestion complete',position:'start',color:'#f87171',backgroundColor:'rgba(13,17,23,0.85)',padding:4,font:{size:11}}};
+    const annotations = annot ? { ingestionEnd: annot } : {};
+    const sharedOpts = {
+      responsive:true, maintainAspectRatio:true, animation:false,
+      plugins:{ legend:{display:false}, annotation:{annotations} },
+      scales:{
+        x:{ ticks:{color:'#6e7681',maxTicksLimit:8,font:{size:11}}, grid:{color:'#21262d'} },
+        y:{ ticks:{color:'#6e7681',font:{size:11}}, grid:{color:'#21262d'} }
+      }
+    };
+    function mkChart(id, data, color) {
+      return new Chart(document.getElementById(id), {
+        type: 'line',
+        data: { labels, datasets:[{ data, borderColor:color,
+          backgroundColor:color+'1a', fill:true, tension:0.3,
+          pointRadius:0, borderWidth:1.5 }] },
+        options: sharedOpts
+      });
+    }
+    mkChart('c1', [0.13, 0.0, 20.91, 45.13, 51.37, 65.5, 66.46, 65.94, 54.03, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 0.0, 0.0, 0.0], '#58a6ff');
+    mkChart('c2', [1.12, 1.12, 15.81, 23.71, 33.63, 45.6, 55.52, 64.35, 81.79, 81.62, 81.55, 81.53, 81.42, 81.42, 81.42, 81.42, 81.42, 81.42, 81.42, 81.42, 81.42, 81.42, 81.42, 81.42, 81.42, 81.42, 81.42, 81.42, 81.42, 81.42, 81.42, 81.42, 81.42, 81.42, 81.42, 81.42, 81.42, 81.42, 81.42, 81.42, 81.42], '#a371f7');
+    mkChart('c3', [5, 5, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10], '#3fb950');
+  </script>
+</body>
+</html>
